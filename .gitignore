@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Project-specific: Test files
+test_real_transcription.py
+test.mp4
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.flv
+*.wmv
+test.srt
+output.srt
+
+# Temporary files
+temp_audio.wav
+*.wav.tmp
+
+# Model cache (optional - uncomment if you don't want to track models)
+# models/
+
+# Output files
+# *.srt
+# *.vtt
+*:Zone.Identifier
