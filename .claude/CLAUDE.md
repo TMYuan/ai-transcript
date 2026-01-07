@@ -144,3 +144,69 @@ Hook runs automatically
 **Remember:** The goal is to ensure every Python file you edit passes all quality checks before you report completion to the user. Read files when fixing errors, don't guess!
 
 <!-- ruff-claude-hook-end -->
+
+---
+
+## Project-Specific Coding Standards
+
+### Import Organization (PEP 8)
+
+**Always place imports at the top of the file**, not inside functions.
+
+✅ **CORRECT:**
+```python
+import logging
+from pathlib import Path
+
+def my_function():
+    logger = logging.getLogger(__name__)
+    path = Path("file.txt")
+```
+
+❌ **WRONG:**
+```python
+def my_function():
+    import logging  # Don't do this
+    from pathlib import Path  # Don't do this
+```
+
+**Exception:** Only import inside a function when:
+- Avoiding circular imports
+- Optional dependency that may not be installed
+- Heavy import that should be lazy-loaded
+
+**If you must import inside a function, explicitly inform the user why.**
+
+### Code Comments
+
+**Write meaningful comments that explain intent and behavior**, not obvious changes.
+
+✅ **CORRECT:**
+```python
+# Calculate exponential moving average for smoothing noisy data
+def calculate_ema(values, alpha=0.3):
+    ...
+
+# Retry with exponential backoff to handle transient network errors
+@retry(max_attempts=3, backoff=2)
+def fetch_data():
+    ...
+```
+
+❌ **WRONG:**
+```python
+# NEW: Added this function for calculations
+def calculate_ema(values, alpha=0.3):
+    ...
+
+# CHANGED: Modified to add retry logic
+@retry(max_attempts=3, backoff=2)
+def fetch_data():
+    ...
+```
+
+**Key principles:**
+- Explain **why** the code exists, not **what** it does (code should be self-explanatory)
+- Don't add comments announcing "new" or "changed" - git history shows that
+- Use docstrings for function/class documentation
+- Use inline comments sparingly for complex logic only  
