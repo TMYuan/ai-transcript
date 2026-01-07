@@ -160,6 +160,24 @@ class TestTranscriber:
         with pytest.raises(TranscriptionError, match="not found|does not exist"):
             transcriber.transcribe_segment("nonexistent.wav", segment)
 
+    def test_transcribe_segment_cuda_error(self, sample_audio_wav):
+        """Test error handling for CUDA/GPU errors"""
+        from unittest.mock import patch
+
+        config = ASRConfig(model_size="tiny", device="cpu")
+        transcriber = Transcriber(config)
+
+        segment = SpeechSegment(start=0.0, end=1.0)
+
+        # Mock the model.transcribe to raise a RuntimeError with CUDA message
+        with patch.object(
+            transcriber.model, "transcribe", side_effect=RuntimeError("CUDA error")
+        ):
+            with pytest.raises(
+                TranscriptionError, match="GPU/CUDA error.*--device cpu"
+            ):
+                transcriber.transcribe_segment(sample_audio_wav, segment)
+
     def test_transcribe_segments_list(self, sample_audio_wav, mock_vad_segments):
         """Test transcribing multiple segments"""
         config = ASRConfig(model_size="tiny", device="cpu", compute_type="int8")
@@ -216,6 +234,34 @@ class TestTranscriber:
 
         assert len(results) == len(segments)
         assert all(isinstance(r, TranscriptSegment) for r in results)
+
+    @pytest.mark.skipif(
+        not torch.cuda.is_available(),
+        reason="Requires CUDA GPU",
+    )
+    def test_gpu_transcription_works(self, sample_audio_wav):
+        """Test that GPU transcription works (even on older GPUs like GTX 1080)
+
+        This test verifies that GPU transcription works on compute capability 6.x GPUs,
+        even though ctranslate2 officially requires 7.0+. In practice, it often works.
+
+        Note: sample_audio_wav is a synthetic tone, not real speech, so may return
+        "[no speech]" - the important part is that GPU inference doesn't crash.
+        """
+        config = ASRConfig(model_size="tiny", device="cuda", compute_type="int8")
+        transcriber = Transcriber(config)
+
+        segment = SpeechSegment(start=0.0, end=2.0)
+
+        # This should work even on sm_61 (GTX 1080) despite warnings
+        result = transcriber.transcribe_segment(sample_audio_wav, segment)
+
+        # Verify it returns a valid result (GPU inference worked)
+        assert isinstance(result, TranscriptSegment)
+        assert result.start == 0.0
+        assert result.end == 2.0
+        assert len(result.text) > 0
+        # Text can be "[no speech]" for synthetic audio - that's OK
 
     @pytest.mark.skipif(
         not torch.cuda.is_available() or torch.cuda.get_device_capability()[0] < 7,

@@ -193,6 +193,19 @@ class Transcriber:
 
             return result
 
+        except RuntimeError as e:
+            # Catch CUDA/cuDNN errors specifically
+            error_msg = str(e).lower()
+            if "cuda" in error_msg or "cudnn" in error_msg or "gpu" in error_msg:
+                raise TranscriptionError(
+                    f"GPU/CUDA error during transcription. Your GPU may not be "
+                    f"supported or drivers may be incompatible. "
+                    f"Try using --device cpu. Error: {e}"
+                ) from e
+            raise TranscriptionError(
+                f"Transcription failed for segment "
+                f"{segment.start:.2f}-{segment.end:.2f}: {e}"
+            ) from e
         except Exception as e:
             raise TranscriptionError(
                 f"Transcription failed for segment "
