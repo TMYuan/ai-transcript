@@ -119,76 +119,6 @@ uv run aitranscript --version
 **Video:** MP4, AVI, MKV, MOV, FLV, WMV, WebM
 **Audio:** WAV, MP3, FLAC, AAC, OGG, M4A
 
-## Model Comparison
-
-| Model | Speed | Accuracy | VRAM | Use Case |
-|-------|-------|----------|------|----------|
-| tiny | ⚡⚡⚡⚡⚡ | ⭐⭐ | ~1GB | Quick drafts |
-| base | ⚡⚡⚡⚡ | ⭐⭐⭐ | ~1GB | Fast processing |
-| small | ⚡⚡⚡ | ⭐⭐⭐⭐ | ~2GB | Balanced |
-| medium | ⚡⚡ | ⭐⭐⭐⭐⭐ | ~5GB | Production (default) |
-| large | ⚡ | ⭐⭐⭐⭐⭐ | ~10GB | Maximum accuracy |
-
-## Performance
-
-Benchmarked on 65-second video with GTX 1080:
-
-| Configuration | Processing Time | Speedup |
-|--------------|-----------------|---------|
-| tiny + CPU | 28.6s | 1.0x |
-| tiny + CUDA | 10.1s | **2.8x** |
-| medium + CUDA | ~30s | - |
-
-## Development
-
-### Setup Development Environment
-
-```bash
-# Clone repository
-git clone https://github.com/TMYuan/ai-transcript.git
-cd ai-transcript
-
-# Install with dev dependencies
-uv sync
-
-# Install pre-commit hooks (optional)
-uv run pre-commit install
-```
-
-### Code Quality
-
-```bash
-# Format code
-uv run ruff format .
-
-# Check and fix linting issues
-uv run ruff check --fix .
-
-# Type checking (optional)
-uv run mypy src
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-uv run pytest
-
-# Run with coverage
-uv run pytest --cov=src --cov-report=html
-
-# Run specific test file
-uv run pytest tests/test_cli.py
-
-# Run with verbose output
-uv run pytest -v
-
-# Run tests matching pattern
-uv run pytest -k "test_gpu"
-```
-
-**Test Coverage:** 206 tests passing, 1 skipped (GPU compute capability check)
-
 ## Project Structure
 
 ```
@@ -215,51 +145,6 @@ ai-transcript/
 └── README.md                    # This file
 ```
 
-## How It Works
-
-1. **Audio Extraction**: Extracts audio from video files (if needed) using FFmpeg
-2. **Voice Activity Detection**: Identifies speech segments using Silero VAD
-3. **Transcription**: Processes each segment with Faster-Whisper model
-4. **Subtitle Generation**: Formats results as SRT or VTT files
-5. **Cleanup**: Automatically removes temporary files
-
-## GPU Support
-
-### Compatibility
-
-**Officially Supported:**
-- NVIDIA GPUs with compute capability ≥7.0 (RTX 20/30/40 series, V100, A100)
-
-**Works in Practice:**
-- Older GPUs like GTX 1080 (sm_61) work despite official ctranslate2 requirements
-- Provides 2.8x speedup over CPU on GTX 1080
-
-### Troubleshooting GPU Issues
-
-If you encounter CUDA errors:
-
-```bash
-# Fallback to CPU
-uv run aitranscript transcribe video.mp4 --device cpu
-
-# Check CUDA availability
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Guidelines
-
-1. **Code Quality**: Follow PEP 8, use ruff for formatting
-2. **Imports**: Place all imports at the top of files
-3. **Comments**: Explain why, not what; avoid "NEW" or "CHANGED" markers
-4. **Tests**: Add tests for new features (we use pytest)
-5. **Documentation**: Update README for user-facing changes
-
-See `.claude/CLAUDE.md` for detailed coding standards.
-
 ## License
 
 MIT License - see LICENSE file for details.
@@ -276,7 +161,3 @@ MIT License - see LICENSE file for details.
 
 - **Issues**: [GitHub Issues](https://github.com/TMYuan/ai-transcript/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/TMYuan/ai-transcript/discussions)
-
----
-
-Made with ❤️ using AI assistance
